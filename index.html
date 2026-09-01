@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📺 TV Retrô - Motivação</title>
+    <style>
+        /* ============================================================ */
+        /*  RESET E CONFIGURAÇÕES                                       */
+        /* ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(ellipse at center, #1a1410 0%, #0a0806 100%);
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+        }
+
+        /* ============================================================ */
+        /*  TV RETRÔ - TAMANHO FIXO (900px de largura)                 */
+        /* ============================================================ */
+        .tv-container {
+            position: relative;
+            width: 900px;
+            max-width: 100%;
+            flex-shrink: 0;
+        }
+
+        /* ★ CORPO DA TV */
+        .tv-body {
+            background: linear-gradient(180deg, #2a2218, #1a120a);
+            border-radius: 50px 50px 80px 80px;
+            padding: 40px 40px 70px 40px;
+            border: 10px solid #3d3224;
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.9),
+                inset 0 0 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        /* ★ BRILHO NA CARCAÇA */
+        .tv-body::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 200, 150, 0.1), transparent);
+            border-radius: 50%;
+        }
+
+        /* ★ PAINEL DA TV (TELA) */
+        .tv-screen {
+            background: #0a0806;
+            border-radius: 25px;
+            padding: 30px;
+            border: 8px solid #1a120a;
+            box-shadow:
+                inset 0 0 80px rgba(0, 0, 0, 0.95),
+                0 0 40px rgba(0, 255, 200, 0.04);
+            position: relative;
+            height: 420px;
+            overflow: hidden;
+        }
+
+        /* ★ EFEITO DE TUBO DE IMAGEM (curvatura) */
+        .tv-screen::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.5) 100%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* ★ EFEITO DE LINHAS DE VARREDURA (scanlines) */
+        .tv-screen::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 3px,
+                rgba(0, 0, 0, 0.12) 3px,
+                rgba(0, 0, 0, 0.12) 4px
+            );
+            pointer-events: none;
+            z-index: 3;
+            animation: scanlineMove 0.1s linear infinite;
+        }
+
+        @keyframes scanlineMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        /* ★ ESTÁTICA (chuvisco) */
+        .static-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 255, 255, 0.04) 2px,
+                rgba(255, 255, 255, 0.04) 3px
+            );
+        }
+
+        .static-overlay.active {
+            opacity: 1;
+            animation: staticNoise 0.05s steps(2) infinite;
+        }
+
+        @keyframes staticNoise {
+            0% { background-position: 0 0; }
+            50% { background-position: 0 15px; }
+            100% { background-position: 0 -15px; }
+        }
+
+        /* ★ PONTOS DE ESTÁTICA (partículas) */
+        .static-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .static-particles.active {
+            opacity: 1;
+        }
+
+        .static-particles .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: particleFlicker 0.1s ease-in-out infinite alternate;
+        }
+
+        @keyframes particleFlicker {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* ★ CONTEÚDO DA TELA */
+        .screen-content {
+            position: relative;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+        /* ★ CANAL / INDICADOR */
+        .channel-indicator {
+            position: absolute;
+            top: 12px;
+            right: 25px;
+            z-index: 4;
+            color: rgba(0, 255, 200, 0.15);
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+        }
+
+        /* ★ FRASE */
+        .frase-display {
+            font-family: 'Courier New', monospace;
+            font-size: 2.2rem;
+            line-height: 1.8;
+            color: #b8e6d0;
+            text-shadow: 0 0 30px rgba(0, 255, 200, 0.06);
+            font-weight: 300;
+            transition: all 0.3s;
+            padding: 15px 0;
+            max-width: 90%;
+        }
+
+        .frase-display::before {
+            content: '"';
+            color: rgba(0, 255, 200, 0.15);
+            font-size: 3.5rem;
+            margin-right: 8px;
+        }
+
+        .frase-display::after {
+            content: '"';
+            color: rgba(0, 255, 200, 0.15);
+            font-size: 3.5rem;
+            margin-left: 8px;
+        }
+
+        /* ★ AUTOR */
+        .autor-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.3rem;
+            color: rgba(0, 255, 200, 0.3);
+            margin-top: 15px;
+            letter-spacing: 3px;
+        }
+
+        .autor-display::before {
+            content: "— ";
+            color: rgba(0, 255, 200, 0.2);
+        }
+
+        /* ★ INFO CANTO INFERIOR */
+        .tv-info {
+            position: absolute;
+            bottom: 12px;
+            left: 25px;
+            z-index: 4;
+            color: rgba(0, 255, 200, 0.06);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ============================================================ */
+        /*  PAINEL DE CONTROLE                                          */
+        /* ============================================================ */
+        .tv-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 35px;
+            margin-top: 25px;
+            padding: 0 15px;
+        }
+
+        /* ★ BOTÃO CANAL (giratório) */
+        .btn-channel {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 35%, #4a3d2e, #1a120a);
+            border: 4px solid #3d3224;
+            box-shadow:
+                inset 0 -4px 0 #0a0806,
+                0 6px 25px rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: #665544;
+            transition: all 0.15s;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            user-select: none;
+        }
+
+        .btn-channel:hover:not(:disabled) {
+            transform: scale(1.06);
+            border-color: #665544;
+        }
+
+        .btn-channel:active:not(:disabled) {
+            transform: scale(0.90);
+            box-shadow: inset 0 2px 0 #0a0806;
+        }
+
+        .btn-channel:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ★ BOTÃO LIGA/DESLIGA */
+        .btn-power {
+            padding: 18px 50px;
+            background: linear-gradient(180deg, #3d3224, #1a120a);
+            border: 4px solid #4a3d2e;
+            border-radius: 40px;
+            color: #887766;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow:
+                inset 0 -5px 0 #0a0806,
+                0 6px 30px rgba(0, 0, 0, 0.6);
+            transition: all 0.15s;
+            position: relative;
+        }
+
+        .btn-power:hover:not(:disabled) {
+            transform: translateY(-3px);
+            border-color: #665544;
+            color: #aa9988;
+        }
+
+        .btn-power:active:not(:disabled) {
+            transform: translateY(6px);
+            box-shadow: inset 0 0px 0 #0a0806;
+        }
+
+        .btn-power:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: translateY(3px);
+        }
+
+        /* ★ LUZINHA DE LIGADO */
+        .power-led {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #1a3a2a;
+            display: inline-block;
+            margin-right: 14px;
+            vertical-align: middle;
+            transition: all 0.3s;
+            box-shadow: none;
+        }
+
+        .power-led.on {
+            background: #00ff88;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+            animation: ledPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes ledPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ★ BOTÃO DE VOLUME */
+        .btn-volume {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 35%, #3d3224, #1a120a);
+            border: 3px solid #3d3224;
+            box-shadow: inset 0 -3px 0 #0a0806, 0 4px 15px rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            color: #665544;
+            font-size: 1.2rem;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            user-select: none;
+        }
+
+        .btn-volume:hover:not(:disabled) {
+            border-color: #665544;
+            transform: scale(1.06);
+        }
+
+        .btn-volume:active:not(:disabled) {
+            transform: scale(0.90);
+        }
+
+        .btn-volume:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ============================================================ */
+        /*  PÉS DA TV                                                  */
+        /* ============================================================ */
+        .tv-feet {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 60px;
+            margin-top: -12px;
+        }
+
+        .tv-feet .foot {
+            width: 45px;
+            height: 22px;
+            background: linear-gradient(180deg, #2a2218, #1a120a);
+            border-radius: 0 0 15px 15px;
+            border: 4px solid #3d3224;
+            border-top: none;
+        }
+
+        /* ============================================================ */
+        /*  ANTENA                                                     */
+        /* ============================================================ */
+        .antenna {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-bottom: -8px;
+            position: relative;
+        }
+
+        .antenna .pole {
+            width: 4px;
+            height: 60px;
+            background: linear-gradient(180deg, #887766, #3d3224);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .antenna .pole::after {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: -8px;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle at 40% 35%, #998877, #3d3224);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .antenna .pole:first-child {
+            transform: rotate(-15deg);
+            transform-origin: bottom;
+        }
+
+        .antenna .pole:last-child {
+            transform: rotate(15deg);
+            transform-origin: bottom;
+        }
+
+        /* ============================================================ */
+        /*  CONTADOR NA TELA                                           */
+        /* ============================================================ */
+        .tv-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 18px;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: rgba(0, 255, 200, 0.12);
+        }
+
+        .tv-stats span {
+            letter-spacing: 2px;
+        }
+
+        .tv-stats strong {
+            color: rgba(0, 255, 200, 0.2);
+            font-weight: 700;
+        }
+
+        /* ============================================================ */
+        /*  RESPONSIVIDADE (mantém o tamanho fixo até onde der)        */
+        /* ============================================================ */
+        @media (max-width: 920px) {
+            .tv-container {
+                width: 100%;
+                max-width: 900px;
+            }
+        }
+
+        /* Em telas muito pequenas, reduz proporcionalmente */
+        @media (max-width: 700px) {
+            .tv-body {
+                padding: 20px 20px 40px 20px;
+                border-radius: 30px 30px 50px 50px;
+                border-width: 6px;
+            }
+
+            .tv-screen {
+                padding: 18px;
+                height: 320px;
+                border-radius: 15px;
+                border-width: 5px;
+            }
+
+            .screen-content {
+                padding: 15px 10px;
+            }
+
+            .frase-display {
+                font-size: 1.4rem;
+                line-height: 1.6;
+            }
+
+            .frase-display::before,
+            .frase-display::after {
+                font-size: 2.2rem;
+            }
+
+            .autor-display {
+                font-size: 1rem;
+            }
+
+            .tv-controls {
+                gap: 18px;
+                flex-wrap: wrap;
+            }
+
+            .btn-power {
+                padding: 14px 30px;
+                font-size: 0.9rem;
+                letter-spacing: 3px;
+                border-width: 3px;
+            }
+
+            .btn-channel {
+                width: 42px;
+                height: 42px;
+                font-size: 1.2rem;
+                border-width: 3px;
+            }
+
+            .btn-volume {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+                border-width: 2px;
+            }
+
+            .antenna .pole {
+                height: 35px;
+                width: 3px;
+            }
+
+            .antenna .pole::after {
+                width: 14px;
+                height: 14px;
+                top: -8px;
+                left: -6px;
+            }
+
+            .antenna {
+                gap: 30px;
+            }
+
+            .tv-feet {
+                padding: 0 25px;
+            }
+
+            .tv-feet .foot {
+                width: 30px;
+                height: 15px;
+                border-width: 3px;
+            }
+
+            .tv-stats {
+                font-size: 0.7rem;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .channel-indicator {
+                font-size: 0.9rem;
+                top: 8px;
+                right: 15px;
+                letter-spacing: 2px;
+            }
+
+            .power-led {
+                width: 10px;
+                height: 10px;
+                margin-right: 10px;
+            }
+
+            .tv-info {
+                font-size: 0.6rem;
+                bottom: 8px;
+                left: 15px;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .tv-body {
+                padding: 12px 12px 25px 12px;
+                border-radius: 20px 20px 30px 30px;
+                border-width: 4px;
+            }
+
+            .tv-screen {
+                padding: 12px;
+                height: 240px;
+                border-radius: 10px;
+                border-width: 3px;
+            }
+
+            .screen-content {
+                padding: 10px 5px;
+            }
+
+            .frase-display {
+                font-size: 1.0rem;
+                line-height: 1.4;
+            }
+
+            .frase-display::before,
+            .frase-display::after {
+                font-size: 1.6rem;
+            }
+
+            .autor-display {
+                font-size: 0.8rem;
+            }
+
+            .btn-power {
+                padding: 10px 18px;
+                font-size: 0.7rem;
+                letter-spacing: 2px;
+                border-width: 2px;
+            }
+
+            .btn-channel {
+                width: 34px;
+                height: 34px;
+                font-size: 0.9rem;
+                border-width: 2px;
+            }
+
+            .btn-volume {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+                border-width: 2px;
+            }
+
+            .tv-controls {
+                gap: 12px;
+            }
+
+            .tv-stats {
+                font-size: 0.55rem;
+                gap: 10px;
+            }
+
+            .channel-indicator {
+                font-size: 0.7rem;
+                top: 5px;
+                right: 10px;
+                letter-spacing: 1px;
+            }
+
+            .tv-info {
+                font-size: 0.5rem;
+                bottom: 5px;
+                left: 10px;
+            }
+
+            .antenna .pole {
+                height: 25px;
+                width: 2px;
+            }
+
+            .antenna .pole::after {
+                width: 10px;
+                height: 10px;
+                top: -6px;
+                left: -4px;
+            }
+
+            .antenna {
+                gap: 20px;
+            }
+
+            .tv-feet {
+                padding: 0 15px;
+            }
+
+            .tv-feet .foot {
+                width: 22px;
+                height: 10px;
+                border-width: 2px;
+            }
+
+            .power-led {
+                width: 8px;
+                height: 8px;
+                margin-right: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tv-container">
+        <!-- ====================== -->
+        <!--  ANTENA                -->
+        <!-- ====================== -->
+        <div class="antenna">
+            <div class="pole"></div>
+            <div class="pole"></div>
+        </div>
+
+        <!-- ====================== -->
+        <!--  CORPO DA TV           -->
+        <!-- ====================== -->
+        <div class="tv-body">
+
+            <!-- TELA -->
+            <div class="tv-screen" id="tvScreen">
+                <!-- Estática -->
+                <div class="static-overlay" id="staticOverlay"></div>
+                <div class="static-particles" id="staticParticles"></div>
+
+                <!-- Canal -->
+                <div class="channel-indicator" id="channelIndicator">CH 03</div>
+
+                <!-- Conteúdo -->
+                <div class="screen-content">
+                    <div class="frase-display" id="fraseDisplay">Aguardando sinal...</div>
+                    <div class="autor-display" id="autorDisplay">Sintonize sua inspiração</div>
+
+                    <!-- Stats na tela -->
+                    <div class="tv-stats">
+                        <span>📺 <strong id="sorteiosCount">000</strong> SORTEIOS</span>
+                        <span>🔊 <strong id="ultimoCanal">--</strong> ÚLTIMO</span>
+                        <span>📡 <strong>50</strong> FRASES</span>
+                    </div>
+                </div>
+
+                <!-- Info canto -->
+                <div class="tv-info">✦ 480i ✦ NTSC ✦</div>
+            </div>
+
+            <!-- ====================== -->
+            <!--  PAINEL DE CONTROLE    -->
+            <!-- ====================== -->
+            <div class="tv-controls">
+                <!-- Canal - -->
+                <button class="btn-channel" id="btnPrev" onclick="trocarCanal(-1)" title="Canal anterior">◀</button>
+
+                <!-- Botão Power (principal) -->
+                <button class="btn-power" id="btnPower" onclick="ligarTV()">
+                    <span class="power-led" id="powerLed"></span>
+                    <span class="btn-text" id="btnText">LIGAR</span>
+                </button>
+
+                <!-- Canal + -->
+                <button class="btn-channel" id="btnNext" onclick="trocarCanal(1)" title="Próximo canal">▶</button>
+
+                <!-- Volume (apenas estético) -->
+                <button class="btn-volume" id="btnVolume" onclick="ajustarVolume()">🔊</button>
+            </div>
+        </div>
+
+        <!-- ====================== -->
+        <!--  PÉS DA TV             -->
+        <!-- ====================== -->
+        <div class="tv-feet">
+            <div class="foot"></div>
+            <div class="foot"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!--  JAVASCRIPT                                                  -->
+    <!-- ============================================================ -->
+    <script>
+        // ============================================================
+        //  🗂️  BANCO DE 50 FRASES
+        // ============================================================
+        const frases = [
+            { texto: "O sucesso é ir de fracasso em fracasso sem perder o entusiasmo.", autor: "Winston Churchill" },
+            { texto: "Acredite em si mesmo e todo o resto virá naturalmente.", autor: "Elon Musk" },
+            { texto: "A única maneira de fazer um excelente trabalho é amar o que você faz.", autor: "Steve Jobs" },
+            { texto: "Não importa o quão devagar você vá, desde que não pare.", autor: "Confúcio" },
+            { texto: "O futuro pertence àqueles que acreditam na beleza de seus sonhos.", autor: "Eleanor Roosevelt" },
+            { texto: "A persistência é o caminho do êxito.", autor: "Charles Chaplin" },
+            { texto: "Se você pode sonhar, você pode fazer.", autor: "Walt Disney" },
+            { texto: "O sucesso não é final, o fracasso não é fatal: o que conta é a coragem de continuar.", autor: "Winston Churchill" },
+            { texto: "A vida é 10% do que acontece e 90% de como você reage a isso.", autor: "Charles R. Swindoll" },
+            { texto: "Siga seus sonhos, eles sabem o caminho.", autor: "Autor desconhecido" },
+            { texto: "As dificuldades preparam pessoas comuns para destinos extraordinários.", autor: "C.S. Lewis" },
+            { texto: "A maior glória não é nunca cair, mas sim levantar-se sempre.", autor: "Nelson Mandela" },
+            { texto: "A motivação nos leva a começar, o hábito nos mantém no caminho.", autor: "Jim Ryun" },
+            { texto: "Nunca é tarde para ser o que você poderia ter sido.", autor: "George Eliot" },
+            { texto: "Você é mais corajoso do que acredita, mais forte do que parece e mais esperto do que pensa.", autor: "A.A. Milne" },
+            { texto: "A adversidade desperta em nós capacidades que, em tempos fáceis, nunca descobriríamos.", autor: "Horácio" },
+            { texto: "Tudo o que você sempre quis está do outro lado do medo.", autor: "George Addair" },
+            { texto: "Não espere por oportunidades, crie você mesmo as suas.", autor: "Autor desconhecido" },
+            { texto: "A diferença entre o possível e o impossível está na determinação.", autor: "Tommy Lasorda" },
+            { texto: "O otimismo é a fé que leva à realização.", autor: "Helen Keller" },
+            { texto: "A sorte é o que acontece quando a preparação encontra a oportunidade.", autor: "Sêneca" },
+            { texto: "Faça hoje o que os outros não fazem para ter amanhã o que eles não terão.", autor: "Autor desconhecido" },
+            { texto: "A mente é tudo. Você se torna o que você pensa.", autor: "Buda" },
+            { texto: "Sonhe grande e ouse falhar.", autor: "Norman Vaughan" },
+            { texto: "A vida não é sobre esperar a tempestade passar, mas sobre aprender a dançar na chuva.", autor: "Vivian Greene" },
+            { texto: "O verdadeiro sucesso é encontrar satisfação no trabalho que você faz.", autor: "Autor desconhecido" },
+            { texto: "Nós somos o que fazemos repetidamente. A excelência, então, não é um ato, mas um hábito.", autor: "Aristóteles" },
+            { texto: "A jornada de mil milhas começa com um único passo.", autor: "Lao Tzu" },
+            { texto: "Acredite que você pode e você já está no meio do caminho.", autor: "Theodore Roosevelt" },
+            { texto: "Se você está passando por um inferno, continue andando.", autor: "Winston Churchill" },
+            { texto: "O sucesso é a soma de pequenos esforços repetidos dia após dia.", autor: "Robert Collier" },
+            { texto: "Coragem não é ausência de medo, mas a capacidade de agir apesar dele.", autor: "Nelson Mandela" },
+            { texto: "Você não pode ter uma vida positiva com uma mente negativa.", autor: "Joyce Meyer" },
+            { texto: "As pessoas não são lembradas pelo que fizeram, mas pelo que as fez sentir.", autor: "Autor desconhecido" },
+            { texto: "A melhor maneira de prever o futuro é criá-lo.", autor: "Peter Drucker" },
+            { texto: "O que você faz hoje pode melhorar todos os seus amanhãs.", autor: "Ralph Marston" },
+            { texto: "Não tenha medo de desistir do bom para alcançar o ótimo.", autor: "John D. Rockefeller" },
+            { texto: "A vida é curta, quebre as regras, perdoe rápido, ame verdadeiramente, ria sem parar e nunca se arrependa de algo que te fez sorrir.", autor: "Mark Twain" },
+            { texto: "A maior descoberta de todos os tempos é que uma pessoa pode mudar seu futuro ao mudar suas atitudes.", autor: "Oprah Winfrey" },
+            { texto: "Não importa quantas vezes você caia, mas sim quantas vezes você se levanta.", autor: "Vince Lombardi" },
+            { texto: "Faça o seu melhor até saber melhor. Então, quando souber melhor, faça melhor.", autor: "Maya Angelou" },
+            { texto: "A persistência é a irmã gêmea da excelência. Uma é a mãe da qualidade, a outra é a mãe do tempo.", autor: "Autor desconhecido" },
+            { texto: "Se você não gosta de algo, mude. Se não puder mudar, mude sua atitude.", autor: "Maya Angelou" },
+            { texto: "O homem que move montanhas começa carregando pequenas pedras.", autor: "Confúcio" },
+            { texto: "A vida é o que acontece enquanto você está ocupado fazendo outros planos.", autor: "John Lennon" },
+            { texto: "Não é a carga que o quebra, mas a forma como você a carrega.", autor: "Lou Holtz" },
+            { texto: "A verdadeira motivação vem de dentro, não de prêmios ou reconhecimento externo.", autor: "Autor desconhecido" },
+            { texto: "A cada dia, a natureza produz o suficiente para nossa necessidade, mas não para nossa ganância.", autor: "Mahatma Gandhi" },
+            { texto: "Você nunca é velho demais para ter um novo objetivo ou sonhar um novo sonho.", autor: "C.S. Lewis" },
+            { texto: "A chave para o sucesso é a disciplina: fazer o que precisa ser feito, mesmo quando não quer.", autor: "Autor desconhecido" }
+        ];
+
+        // ============================================================
+        //  📺  CONTROLES DA TV
+        // ============================================================
+        let tvLigada = false;
+        let contadorSorteios = 0;
+        let ultimoIndice = -1;
+        let sorteando = false;
+        let timeoutIds = [];
+
+        // Elementos
+        const fraseDisplay = document.getElementById('fraseDisplay');
+        const autorDisplay = document.getElementById('autorDisplay');
+        const staticOverlay = document.getElementById('staticOverlay');
+        const staticParticles = document.getElementById('staticParticles');
+        const powerLed = document.getElementById('powerLed');
+        const btnText = document.getElementById('btnText');
+        const btnPower = document.getElementById('btnPower');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        const btnVolume = document.getElementById('btnVolume');
+        const channelIndicator = document.getElementById('channelIndicator');
+        const sorteiosCount = document.getElementById('sorteiosCount');
+        const ultimoCanal = document.getElementById('ultimoCanal');
+
+        let canalAtual = 3;
+        let volume = 50;
+
+        // ============================================================
+        //  📺  GERAR PARTÍCULAS DE ESTÁTICA
+        // ============================================================
+        function gerarParticulas() {
+            staticParticles.innerHTML = '';
+            for (let i = 0; i < 50; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 4 + 1;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.animationDelay = (Math.random() * 0.5) + 's';
+                p.style.animationDuration = (0.05 + Math.random() * 0.1) + 's';
+                staticParticles.appendChild(p);
+            }
+        }
+        gerarParticulas();
+
+        // ============================================================
+        //  📺  LIGAR / DESLIGAR TV
+        // ============================================================
+        function ligarTV() {
+            tvLigada = !tvLigada;
+
+            if (tvLigada) {
+                // Ligar
+                powerLed.classList.add('on');
+                btnText.textContent = 'DESLIGAR';
+                btnPower.style.borderColor = '#00ff88';
+                btnPower.style.color = '#00ff88';
+                staticOverlay.classList.add('active');
+                staticParticles.classList.add('active');
+                channelIndicator.style.color = 'rgba(0, 255, 200, 0.3)';
+
+                // Mostra frase após estática
+                setTimeout(() => {
+                    staticOverlay.classList.remove('active');
+                    staticParticles.classList.remove('active');
+                    sortearFrase();
+                }, 900);
+
+                // Habilita botões
+                btnPrev.disabled = false;
+                btnNext.disabled = false;
+                btnVolume.disabled = false;
+
+            } else {
+                // Desligar
+                powerLed.classList.remove('on');
+                btnText.textContent = 'LIGAR';
+                btnPower.style.borderColor = '#4a3d2e';
+                btnPower.style.color = '#887766';
+                staticOverlay.classList.add('active');
+                staticParticles.classList.add('active');
+
+                setTimeout(() => {
+                    staticOverlay.classList.remove('active');
+                    staticParticles.classList.remove('active');
+                    fraseDisplay.textContent = 'Sinal perdido...';
+                    autorDisplay.textContent = 'Desligue e ligue novamente';
+                    channelIndicator.style.color = 'rgba(0, 255, 200, 0.08)';
+                }, 700);
+
+                // Desabilita botões
+                btnPrev.disabled = true;
+                btnNext.disabled = true;
+                btnVolume.disabled = true;
+            }
+        }
+
+        // ============================================================
+        //  📺  SORTEAR FRASE (com efeito de estática)
+        // ============================================================
+        function sortearFrase() {
+            if (!tvLigada || sorteando) return;
+            sorteando = true;
+
+            // Desabilita botões durante o sorteio
+            btnPrev.disabled = true;
+            btnNext.disabled = true;
+            btnPower.disabled = true;
+
+            // Efeito de estática
+            staticOverlay.classList.add('active');
+            staticParticles.classList.add('active');
+
+            // Sorteia índice
+            let idx;
+            do {
+                idx = Math.floor(Math.random() * frases.length);
+            } while (idx === ultimoIndice && frases.length > 1);
+            ultimoIndice = idx;
+
+            // Atualiza canal
+            canalAtual = idx + 1;
+            channelIndicator.textContent = `CH ${String(canalAtual).padStart(2, '0')}`;
+
+            // Atualiza estatísticas
+            contadorSorteios++;
+            sorteiosCount.textContent = String(contadorSorteios).padStart(3, '0');
+            ultimoCanal.textContent = `#${String(idx + 1).padStart(2, '0')}`;
+
+            // Mostra nova frase com delay (efeito de estática)
+            setTimeout(() => {
+                // Troca a frase com animação de "flicker"
+                let flickers = 0;
+                const maxFlickers = 4 + Math.floor(Math.random() * 5);
+
+                function flicker() {
+                    if (flickers >= maxFlickers) {
+                        // Frase final
+                        fraseDisplay.textContent = frases[idx].texto;
+                        autorDisplay.textContent = frases[idx].autor;
+                        staticOverlay.classList.remove('active');
+                        staticParticles.classList.remove('active');
+
+                        // Reabilita botões
+                        btnPrev.disabled = false;
+                        btnNext.disabled = false;
+                        btnPower.disabled = false;
+                        sorteando = false;
+                        return;
+                    }
+
+                    // Mostra estática rápida
+                    staticOverlay.classList.toggle('active');
+
+                    // Mostra uma frase aleatória rapidamente
+                    const randIdx = Math.floor(Math.random() * frases.length);
+                    fraseDisplay.textContent = frases[randIdx].texto;
+                    autorDisplay.textContent = frases[randIdx].autor;
+
+                    flickers++;
+                    setTimeout(flicker, 80 + Math.random() * 120);
+                }
+
+                flicker();
+            }, 600);
+        }
+
+        // ============================================================
+        //  📺  TROCAR CANAL (próximo/anterior)
+        // ============================================================
+        function trocarCanal(direcao) {
+            if (!tvLigada || sorteando) return;
+
+            // Efeito de estática rápida
+            staticOverlay.classList.add('active');
+            staticParticles.classList.add('active');
+
+            // Sorteia uma frase (como se estivesse mudando de canal)
+            let idx;
+            do {
+                idx = Math.floor(Math.random() * frases.length);
+            } while (idx === ultimoIndice && frases.length > 1);
+            ultimoIndice = idx;
+
+            canalAtual = idx + 1;
+            channelIndicator.textContent = `CH ${String(canalAtual).padStart(2, '0')}`;
+
+            contadorSorteios++;
+            sorteiosCount.textContent = String(contadorSorteios).padStart(3, '0');
+            ultimoCanal.textContent = `#${String(idx + 1).padStart(2, '0')}`;
+
+            setTimeout(() => {
+                fraseDisplay.textContent = frases[idx].texto;
+                autorDisplay.textContent = frases[idx].autor;
+                staticOverlay.classList.remove('active');
+                staticParticles.classList.remove('active');
+            }, 350);
+        }
+
+        // ============================================================
+        //  📺  AJUSTAR VOLUME (efeito visual)
+        // ============================================================
+        function ajustarVolume() {
+            if (!tvLigada) return;
+
+            volume = (volume + 10) % 110;
+            const volumeText = volume > 100 ? 'MAX' : volume + '%';
+            btnVolume.textContent = volume > 100 ? '🔊' : '🔉';
+
+            // Mostra no canto
+            const info = document.querySelector('.tv-info');
+            info.textContent = `🔊 ${volumeText}`;
+            info.style.color = 'rgba(0, 255, 200, 0.3)';
+            setTimeout(() => {
+                info.textContent = '✦ 480i ✦ NTSC ✦';
+                info.style.color = 'rgba(0, 255, 200, 0.06)';
+            }, 1200);
+        }
+
+        // ============================================================
+        //  📺  TECLADO - ATALHOS
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (tvLigada) {
+                    sortearFrase();
+                } else {
+                    ligarTV();
+                }
+            }
+            if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                trocarCanal(1);
+            }
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                trocarCanal(-1);
+            }
+            if (e.key === 'v' || e.key === 'V') {
+                ajustarVolume();
+            }
+            if (e.key === 'p' || e.key === 'P') {
+                ligarTV();
+            }
+        });
+
+        // ============================================================
+        //  🚀  INICIALIZAR COM MENSAGEM
+        // ============================================================
+        window.onload = function() {
+            fraseDisplay.textContent = 'Pressione LIGAR';
+            autorDisplay.textContent = 'ou tecle ENTER';
+            channelIndicator.textContent = 'CH --';
+            btnPrev.disabled = true;
+            btnNext.disabled = true;
+            btnVolume.disabled = true;
+        };
+    </script>
+
+</body>
+</html>
